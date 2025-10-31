@@ -1,8 +1,8 @@
-import { neon } from '@neondatabase/serverless'
-import 'dotenv/config'
+import { neon } from '@neondatabase/serverless';
+import 'dotenv/config';
 
-//Cria a conexão SQL usando o DB URI
-export const sql = neon(process.env.DATABSE_URI)
+// Cria a conexão SQL usando o DB URI
+export const sql = neon(process.env.DATABASE_URI)
 
 export async function initDB() {
   try {
@@ -25,6 +25,7 @@ export async function initDB() {
         hora_servico TIME NOT NULL,
         valor NUMERIC(10,2) DEFAULT 0,
         status VARCHAR(50) NOT NULL DEFAULT 'Agendado',
+        data_conclusao DATE,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )

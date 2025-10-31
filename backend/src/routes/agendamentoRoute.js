@@ -1,12 +1,19 @@
-import express from 'express'
-import { createAgendamento, deleteAgendamento, getAgendamentoByUserId, getSummary } from '../controllers/agendamentoController.js'
+import express from 'express';
+import {
+  createAgendamento,
+  deleteAgendamento,
+  getAgendamentoByUserId,
+  getSummary,
+  updateStatus
+} from '../controllers/agendamentoController.js';
 
-const router = express.Router()
+const router = express.Router();
 
-router.get("/:servico_tipo_id", getAgendamentoByUserId);
-router.post("/api/agendamento", createAgendamento);
-router.delete("/:id", deleteAgendamento);
-router.get("/summary", getSummary);
+// Rotas principais de agendamento
+router.get('/:servico_tipo_id', getAgendamentoByUserId);  
+router.post('/', createAgendamento);                      
+router.delete('/:id', deleteAgendamento);                 
+router.put('/:id/status', updateStatus);                  
+router.get('/summary/geral', getSummary);                 
 
-
-export default router
+export default router;

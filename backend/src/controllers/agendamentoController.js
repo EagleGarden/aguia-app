@@ -1,16 +1,17 @@
 import { sql } from "../config/db.js";
 
+// Obter agendamentos por tipo de serviço
 export async function getAgendamentoByUserId(req, res) {
   try {
     const { servico_tipo_id } = req.params;
 
     const agendamentos = await sql`
-          SELECT a.*, s.nome AS servico_nome
-          FROM agendamento a
-          JOIN servico_tipo s ON a.servico_tipo_id = s.id
-          WHERE a.servico_tipo_id = ${servico_tipo_id}
-          ORDER BY a.data_servico, a.hora_servico
-        `;
+      SELECT a.*, s.nome AS servico_nome
+      FROM agendamento a
+      JOIN servico_tipo s ON a.servico_tipo_id = s.id
+      WHERE a.servico_tipo_id = ${servico_tipo_id}
+      ORDER BY a.data_servico, a.hora_servico
+    `;
 
     res.status(200).json(agendamentos);
   } catch (error) {
@@ -19,6 +20,7 @@ export async function getAgendamentoByUserId(req, res) {
   }
 }
 
+// Criar um novo agendamento
 export async function createAgendamento(req, res) {
   try {
     const { servico_tipo_id, data_servico, hora_servico, valor } = req.body;
@@ -31,9 +33,7 @@ export async function createAgendamento(req, res) {
 
     const agendamento = await sql`
       INSERT INTO agendamento (servico_tipo_id, data_servico, hora_servico, valor)
-      VALUES (${servico_tipo_id}, ${data_servico}, ${hora_servico}, ${
-      valor || 0
-    })
+      VALUES (${servico_tipo_id}, ${data_servico}, ${hora_servico}, ${valor || 0})
       RETURNING *
     `;
 
@@ -44,6 +44,7 @@ export async function createAgendamento(req, res) {
   }
 }
 
+// Deletar um agendamento
 export async function deleteAgendamento(req, res) {
   try {
     const { id } = req.params;
@@ -67,6 +68,45 @@ export async function deleteAgendamento(req, res) {
   }
 }
 
+// Atualizar status de um agendamento (ex: marcar como concluído)
+export async function updateStatus(req, res) {
+  try {
+    const { id } = req.params;
+    const { novo_status } = req.body;
+
+    if (!novo_status) {
+      return res.status(400).json({ message: "O novo status é obrigatório." });
+    }
+
+    let dataConclusao = null;
+
+    // Se o status for "Concluído", define a data atual
+    if (novo_status === "Concluído") {
+      dataConclusao = new Date().toISOString().split("T")[0];
+    }
+
+    const resultado = await sql`
+      UPDATE agendamento
+      SET 
+        status = ${novo_status},
+        data_conclusao = ${dataConclusao},
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
+    if (resultado.length === 0) {
+      return res.status(404).json({ message: "Agendamento não encontrado." });
+    }
+
+    res.status(200).json(resultado[0]);
+  } catch (error) {
+    console.error("Erro ao atualizar status:", error);
+    res.status(500).json({ message: "Erro interno do servidor." });
+  }
+}
+
+// Obter resumo geral
 export async function getSummary(req, res) {
   try {
     const totalConcluidos = await sql`
