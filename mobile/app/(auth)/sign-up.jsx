@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Image, // Corrigido: Importado de 'react-native'
+} from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { styles } from "@/assets/styles/auth.styles.js";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/colors.js";
-import { Image, ImageNativeModule } from "expo-image";
+// Removido 'ImageNativeModule' e 'Image' de 'expo-image'
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function SignUpScreen() {
@@ -36,9 +42,12 @@ export default function SignUpScreen() {
       // and capture OTP code
       setPendingVerification(true);
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+      if (err.errors?.[0]?.code === 'form_identifier_exists') {
+        setError("That email address is already in use. Please try another.");
+      } else {
+        setError('An error occurred. Please try again.');
+      }
+      console.error(err);
     }
   };
 
@@ -79,7 +88,7 @@ export default function SignUpScreen() {
             <Ionicons name="alert-circle" size={20} color={COLORS.expense} />
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity onPress={() => setError("")}>
-              <Ionicons name="close" size={20} color={COLORS.textLight} />
+              <Ionicons name="" size={20} color={COLORS.textLight} />
             </TouchableOpacity>
           </View>
         ) : null}
@@ -100,8 +109,8 @@ export default function SignUpScreen() {
   }
 
   return (
-    <KeyboardAwareScrollView 
-      style={{ flex: 1}}
+    <KeyboardAwareScrollView
+      style={{ flex: 1 }}
       contentContainerStyle={{ flexGrow: 1 }}
       enableOnAndroid={true}
       enableAutomaticScroll={true}
