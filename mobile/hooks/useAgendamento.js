@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Alert } from 'react-native';
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = "https://aguia-app-backend.onrender.com/api";
 
 export const useAgendamento = (servicoTipoId) => { 
     const [agendamentos, setAgendamentos] = useState([]);
