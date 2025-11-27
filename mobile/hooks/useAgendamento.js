@@ -1,10 +1,7 @@
-import { useCallback, useState } from "react"; // <--- O erro estava aqui (faltava importar)
+import { useCallback, useState } from "react";
 import { Alert } from 'react-native';
 
-// IMPORTANTE: Verifique se essa URL está certa (sem barra no final)
-// Se estiver rodando no Render: "https://nome-do-app.onrender.com/api"
-// Se estiver rodando local no celular: "http://SEU_IP_DO_PC:8000/api"
-const API_URL = "https://aguia-backend.onrender.com/api";
+const API_URL = "https://aguia-app-backend.onrender.com/api"; 
 
 export const useAgendamento = (servicoTipoId) => {
     const [agendamentos, setAgendamentos] = useState([]);
@@ -31,24 +28,11 @@ export const useAgendamento = (servicoTipoId) => {
         try {
             const url = servicoTipoId
                 ? `${API_URL}/agendamento/${servicoTipoId}`
-                : `${API_URL}/agendamento`; // Rota para listar todos
-
-            console.log("Tentando buscar na URL:", url);
+                : `${API_URL}/agendamento`; 
 
             const response = await fetch(url);
-
-            // Debug para ver se é HTML ou JSON
-            const textoResposta = await response.text();
-
-            try {
-                const data = JSON.parse(textoResposta);
-                setAgendamentos(data);
-            } catch (e) {
-                console.error("ERRO CRÍTICO: O servidor não retornou JSON.");
-                console.error("Conteúdo recebido:", textoResposta);
-                // Se aparecer HTML aqui no console, sabemos que a URL está errada
-            }
-
+            const data = await response.json();
+            setAgendamentos(data);
         } catch (error) {
             console.error("Error fetching agendamentos:", error);
         }
@@ -65,11 +49,31 @@ export const useAgendamento = (servicoTipoId) => {
         }
     }, [fetchAgendamentos, fetchSummary]);
 
+    // --- NOVA FUNÇÃO: MARCAR COMO CONCLUÍDO ---
+    const markAsCompleted = async (id) => {
+        try {
+            const response = await fetch(`${API_URL}/agendamento/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ novo_status: 'Concluído' })
+            });
+
+            if (!response.ok) throw new Error('Falha ao atualizar status');
+
+            // Recarrega os dados para atualizar a lista e o SALDO lá em cima
+            loadData();
+            Alert.alert('Sucesso', 'Serviço marcado como concluído! O valor foi adicionado à carteira.');
+        } catch (error) {
+            console.error('Error updating status:', error);
+            Alert.alert('Erro', 'Não foi possível concluir o serviço.');
+        }
+    }
+
     const deleteAgendamento = async (id) => {
         try {
             const response = await fetch(`${API_URL}/agendamento/${id}`, { method: 'DELETE' });
             if (!response.ok) throw new Error('Failed to delete agendamento');
-
+            
             loadData();
             Alert.alert('Sucesso', 'Agendamento deletado com sucesso');
         } catch (error) {
@@ -78,5 +82,6 @@ export const useAgendamento = (servicoTipoId) => {
         }
     }
 
-    return { agendamentos, summary, isLoading, loadData, deleteAgendamento }
+    // Retornamos a nova função aqui
+    return { agendamentos, summary, isLoading, loadData, deleteAgendamento, markAsCompleted }
 }

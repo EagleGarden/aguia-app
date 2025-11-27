@@ -17,7 +17,8 @@ export default function Page() {
   const router = useRouter()
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const { agendamentos, summary, isLoading, loadData, deleteAgendamento } = useAgendamento()
+  // 1. Adicionamos 'markAsCompleted' aqui
+  const { agendamentos, summary, isLoading, loadData, deleteAgendamento, markAsCompleted } = useAgendamento()
 
   const onRefresh = async () => {
     setRefreshing(true)
@@ -28,6 +29,18 @@ export default function Page() {
   useEffect(() => {
     loadData()
   }, [loadData])
+
+  // 2. Criamos a função para lidar com a conclusão
+  const handleComplete = (id) => {
+    Alert.alert(
+      'Concluir Serviço',
+      'Deseja marcar este serviço como concluído? O valor será somado à carteira.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Concluir', onPress: () => markAsCompleted(id) },
+      ]
+    )
+  }
 
   const handleDelete = (id) => {
     Alert.alert('Deletar Serviço', 'Tem certeza que deseja deletar este agendamento?', [
@@ -81,7 +94,14 @@ export default function Page() {
         style={styles.transactionList}
         contentContainerStyle={styles.transactionListContent}
         data={agendamentos}
-        renderItem={({ item }) => <AgendamentoItem item={item} onDelete={handleDelete} />}
+        // 3. Passamos a função onComplete para o item
+        renderItem={({ item }) => (
+          <AgendamentoItem 
+            item={item} 
+            onDelete={handleDelete} 
+            onComplete={handleComplete} 
+          />
+        )}
         ListEmptyComponent={<NoAgendamentosFound />}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}

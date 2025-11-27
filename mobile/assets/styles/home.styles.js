@@ -1,4 +1,3 @@
-// styles/home.styles.js
 import { StyleSheet } from "react-native";
 import { COLORS } from "../../constants/colors";
 
@@ -254,11 +253,16 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     paddingBottom: 5,
   },
-  transactionsList: {
+  
+  // --- AQUI ESTAVA A DIFERENÇA ---
+  // Renomeei para singular (transactionList) para bater com o index.jsx
+  // Adicionei paddingHorizontal: 20 no Content
+  
+  transactionList: {
     flex: 1,
-    marginHorizontal: 20,
   },
-  transactionsListContent: {
-    paddingBottom: 20,
+  transactionListContent: {
+    paddingBottom: 50,
+    paddingHorizontal: 20, // <--- O SEGREDO: Isso alinha com a parte de cima!
   },
 });
