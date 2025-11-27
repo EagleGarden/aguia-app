@@ -1,6 +1,22 @@
 import { sql } from "../config/db.js";
 
-// Obter agendamentos por tipo de serviço
+// --- NOVA FUNÇÃO: Listar TODOS os agendamentos (Para a Home) ---
+export async function getAllAgendamentos(req, res) {
+  try {
+    const agendamentos = await sql`
+      SELECT a.*, s.nome AS servico_nome
+      FROM agendamento a
+      JOIN servico_tipo s ON a.servico_tipo_id = s.id
+      ORDER BY a.data_servico, a.hora_servico
+    `;
+    res.status(200).json(agendamentos);
+  } catch (error) {
+    console.error("Erro ao obter todos os agendamentos:", error);
+    res.status(500).json({ message: "Erro interno do servidor." });
+  }
+}
+
+// Obter agendamentos por tipo de serviço (Filtro)
 export async function getAgendamentoByUserId(req, res) {
   try {
     const { servico_tipo_id } = req.params;
@@ -80,7 +96,7 @@ export async function updateStatus(req, res) {
 
     let dataConclusao = null;
 
-    // Se o status for "Concluído", define a data atual
+    // Se o status for "Concluído", define a data atual para a Carteira
     if (novo_status === "Concluído") {
       dataConclusao = new Date().toISOString().split("T")[0];
     }
@@ -106,7 +122,7 @@ export async function updateStatus(req, res) {
   }
 }
 
-// Obter resumo geral
+// Obter resumo geral (Concluídos, Agendados, Valor Total)
 export async function getSummary(req, res) {
   try {
     const totalConcluidos = await sql`
