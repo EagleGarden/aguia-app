@@ -4,18 +4,25 @@ import { COLORS } from "../constants/colors";
 
 export const BalanceCard = ({ summary }) => {
   
-  // Lógica para pegar o primeiro e último dia do mês atual
+  // --- Lógica de Data Automática ---
   const date = new Date();
-  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  
+  // Calcula o último dia do mês atual (ex: 30 ou 31)
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  
+  // Lista de meses abreviados
+  const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const currentMonth = monthNames[date.getMonth()];
 
-  // Formatando para "01/11 a 30/11"
-  const formatDateSimple = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}`;
-  const periodo = `${formatDateSimple(firstDay)} a ${formatDateSimple(lastDay)}`;
+  // Monta o texto: "01 a 30 de Nov"
+  const periodo = `01 a ${lastDay} de ${currentMonth}`;
 
   return (
     <View style={styles.balanceCard}>
+      
+      {/* Título formatado exatamente como você pediu */}
       <Text style={styles.balanceTitle}>Total Ganho ({periodo})</Text> 
+      
       <Text style={styles.balanceAmount}>R$ {parseFloat(summary.valor_total).toFixed(2)}</Text>
       
       <View style={styles.balanceStats}>

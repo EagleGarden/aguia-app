@@ -26,6 +26,7 @@ export const styles = StyleSheet.create({
   headerLogo: {
     width: 50,
     height: 50,
+    marginRight: 15,
   },
   welcomeContainer: {
     flex: 1,
@@ -44,11 +45,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: COLORS.text,
   },
   addButton: {
     backgroundColor: COLORS.primary,
@@ -78,16 +74,15 @@ export const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
+
+  // --- BALANCE CARD ---
   balanceCard: {
     backgroundColor: COLORS.card,
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
     shadowColor: COLORS.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
@@ -95,13 +90,13 @@ export const styles = StyleSheet.create({
   balanceTitle: {
     fontSize: 16,
     color: COLORS.textLight,
-    marginBottom: 8,
+    marginBottom: 10, // <--- REDUZIDO DE 20 PARA 10 (Espaço Título -> Valor)
   },
   balanceAmount: {
     fontSize: 32,
     fontWeight: "bold",
     color: COLORS.text,
-    marginBottom: 20,
+    marginBottom: 10, // <--- REDUZIDO DE 20 PARA 10 (Espaço Valor -> Estatísticas)
   },
   balanceStats: {
     flexDirection: "row",
@@ -124,6 +119,8 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
+
+  // --- LISTA ---
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
@@ -137,10 +134,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     shadowColor: COLORS.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
@@ -169,10 +163,6 @@ export const styles = StyleSheet.create({
     color: COLORS.text,
     marginBottom: 4,
   },
-  transactionCategory: {
-    fontSize: 14,
-    color: COLORS.textLight,
-  },
   transactionRight: {
     alignItems: "flex-end",
   },
@@ -190,8 +180,19 @@ export const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: COLORS.border,
   },
-  transactionsContainer: {
-    marginBottom: 20,
+  transactionsHeaderContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 5,
+  },
+  transactionList: {
+    flex: 1,
+  },
+  transactionListContent: {
+    paddingBottom: 50,
+    paddingHorizontal: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -212,9 +213,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  emptyStateIcon: {
-    marginBottom: 16,
-  },
+  emptyStateIcon: { marginBottom: 16 },
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: "600",
@@ -245,24 +244,5 @@ export const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: "600",
     marginLeft: 6,
-  },
-  transactionsHeaderContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-    paddingBottom: 5,
-  },
-  
-  // --- AQUI ESTAVA A DIFERENÇA ---
-  // Renomeei para singular (transactionList) para bater com o index.jsx
-  // Adicionei paddingHorizontal: 20 no Content
-  
-  transactionList: {
-    flex: 1,
-  },
-  transactionListContent: {
-    paddingBottom: 50,
-    paddingHorizontal: 20, // <--- O SEGREDO: Isso alinha com a parte de cima!
   },
 });
