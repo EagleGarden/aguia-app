@@ -1,16 +1,17 @@
 import { sql } from "../config/db.js";
 
-// --- Listar TODOS os agendamentos (Para a Home) ---
+// --- Listar APENAS OS PENDENTES (Para a Home ficar limpa) ---
 export async function getAllAgendamentos(req, res) {
   try {
     const agendamentos = await sql`
       SELECT a.*, s.nome AS servico_nome
       FROM agendamento a
       JOIN servico_tipo s ON a.servico_tipo_id = s.id
+      -- 👇 O SEGREDINHO ESTÁ AQUI:
+      -- Só trazemos o que NÃO estiver concluído.
+      -- Assim que você marcar como concluído, ele some da lista, mas fica no banco somando valor.
+      WHERE a.status != 'Concluído' 
       ORDER BY 
-        -- 1. Joga os Concluídos para o final da lista
-        CASE WHEN a.status = 'Concluído' THEN 2 ELSE 1 END,
-        -- 2. Ordena por data (mais antigos/urgentes primeiro)
         a.data_servico ASC,
         a.hora_servico ASC
     `;
@@ -21,7 +22,7 @@ export async function getAllAgendamentos(req, res) {
   }
 }
 
-// Obter agendamentos por tipo de serviço (Filtro)
+// Obter agendamentos por tipo de serviço
 export async function getAgendamentoByUserId(req, res) {
   try {
     const { servico_tipo_id } = req.params;
@@ -89,7 +90,7 @@ export async function deleteAgendamento(req, res) {
   }
 }
 
-// Atualizar status de um agendamento
+// Atualizar status
 export async function updateStatus(req, res) {
   try {
     const { id } = req.params;
@@ -126,7 +127,7 @@ export async function updateStatus(req, res) {
   }
 }
 
-// Obter resumo geral
+// Obter resumo geral (Essa função CONTINUA contando os Concluídos, mesmo que a lista não mostre)
 export async function getSummary(req, res) {
   try {
     const totalConcluidos = await sql`
@@ -136,7 +137,7 @@ export async function getSummary(req, res) {
 
     const totalAgendados = await sql`
       SELECT COUNT(*) AS total_agendados
-      FROM agendamento WHERE status = 'Agendado'
+      FROM agendamento WHERE status != 'Concluído'
     `;
 
     const totalAndamento = await sql`
