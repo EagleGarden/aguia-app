@@ -1,21 +1,30 @@
+// components/AgendamentoItem.jsx
+
 import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "../assets/styles/home.styles";
 import { COLORS } from "../constants/colors";
 import { formatDate } from "../lib/utils"; 
 
-const SERVICO_ICONS = {
-  "Corte de Grama": "cut-outline",
-  "Poda de Árvore": "leaf",
-  "Limpeza de Jardim": "trash-outline",
-  "Paisagismo": "flower-outline",
+// Função inteligente para escolher o ícone baseado no nome
+const getIconName = (nomeServico) => {
+  const nome = nomeServico.toLowerCase();
+
+  if (nome.includes('corte') || nome.includes('grama')) return 'cut-outline';
+  if (nome.includes('poda') || nome.includes('arvore') || nome.includes('árvore')) return 'leaf-outline';
+  if (nome.includes('limpeza')) return 'brush-outline'; // Mudei de lixeira para vassoura/escova
+  if (nome.includes('paisagismo') || nome.includes('jardim')) return 'flower-outline';
+  if (nome.includes('veneno') || nome.includes('praga')) return 'flask-outline'; // Ícone para veneno
+  
+  return 'construct-outline'; // Padrão
 };
 
-// Recebemos a nova função 'onComplete' aqui
 export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
   const isConcluido = item.status === 'Concluído';
   const statusColor = isConcluido ? COLORS.income : COLORS.textLight;
-  const iconName = SERVICO_ICONS[item.servico_nome] || "leaf-outline";
+  
+  // Usa a função para pegar o ícone certo
+  const iconName = getIconName(item.servico_nome);
 
   return (
     <View style={styles.transactionCard}>
@@ -35,7 +44,7 @@ export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
         </View>
       </TouchableOpacity>
 
-      {/* AÇÕES (BOTOES DO LADO DIREITO) */}
+      {/* AÇÕES */}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         
         {/* Botão de CONCLUIR (Só aparece se NÃO estiver concluído) */}
@@ -49,9 +58,17 @@ export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
         )}
 
         {/* Botão de DELETAR */}
-        <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(item.id)}>
-            <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
-        </TouchableOpacity>
+        {/* PROTEÇÃO: Só mostramos a lixeira se o serviço NÃO estiver concluído */}
+        {!isConcluido ? (
+          <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(item.id)}>
+              <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
+          </TouchableOpacity>
+        ) : (
+          // Opcional: Mostra um cadeado ou nada para indicar que está "travado" no histórico
+          <View style={[styles.deleteButton, { opacity: 0.3 }]}>
+             <Ionicons name="lock-closed-outline" size={20} color={COLORS.textLight} />
+          </View>
+        )}
 
       </View>
     </View>

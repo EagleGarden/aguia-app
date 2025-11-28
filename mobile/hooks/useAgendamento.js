@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Alert } from 'react-native';
 
+// URL CORRIGIDA (com o /api no final)
 const API_URL = "https://aguia-app-backend.onrender.com/api"; 
 
 export const useAgendamento = (servicoTipoId) => {
@@ -49,7 +50,6 @@ export const useAgendamento = (servicoTipoId) => {
         }
     }, [fetchAgendamentos, fetchSummary]);
 
-    // --- NOVA FUNÇÃO: MARCAR COMO CONCLUÍDO ---
     const markAsCompleted = async (id) => {
         try {
             const response = await fetch(`${API_URL}/agendamento/${id}/status`, {
@@ -60,9 +60,8 @@ export const useAgendamento = (servicoTipoId) => {
 
             if (!response.ok) throw new Error('Falha ao atualizar status');
 
-            // Recarrega os dados para atualizar a lista e o SALDO lá em cima
-            loadData();
-            Alert.alert('Sucesso', 'Serviço marcado como concluído! O valor foi adicionado à carteira.');
+            loadData(); // Recarrega para atualizar saldo e ordem da lista
+            Alert.alert('Sucesso', 'Serviço marcado como concluído! Valor adicionado à carteira.');
         } catch (error) {
             console.error('Error updating status:', error);
             Alert.alert('Erro', 'Não foi possível concluir o serviço.');
@@ -82,6 +81,5 @@ export const useAgendamento = (servicoTipoId) => {
         }
     }
 
-    // Retornamos a nova função aqui
     return { agendamentos, summary, isLoading, loadData, deleteAgendamento, markAsCompleted }
 }

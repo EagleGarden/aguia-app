@@ -11,13 +11,11 @@ import { BalanceCard } from '../../components/BalanceCard'
 import NoAgendamentosFound from '../../components/NoAgendamentosFound'
 import { AgendamentoItem } from '../../components/AgendamentoItem'
 
-// TEM QUE TER "export default" AQUI
 export default function Page() {
   const { user } = useUser()
   const router = useRouter()
   const [refreshing, setRefreshing] = React.useState(false);
 
-  // 1. Adicionamos 'markAsCompleted' aqui
   const { agendamentos, summary, isLoading, loadData, deleteAgendamento, markAsCompleted } = useAgendamento()
 
   const onRefresh = async () => {
@@ -30,7 +28,7 @@ export default function Page() {
     loadData()
   }, [loadData])
 
-  // 2. Criamos a função para lidar com a conclusão
+  // Função para CONCLUIR
   const handleComplete = (id) => {
     Alert.alert(
       'Concluir Serviço',
@@ -42,10 +40,20 @@ export default function Page() {
     )
   }
 
-  const handleDelete = (id) => {
-    Alert.alert('Deletar Serviço', 'Tem certeza que deseja deletar este agendamento?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Deletar', style: 'destructive', onPress: () => deleteAgendamento(id) },
+  // Função para DELETAR (Com mensagem diferente se já foi pago)
+  const handleDelete = (id, isConcluido) => {
+    const titulo = isConcluido ? 'Apagar Histórico?' : 'Cancelar Serviço?';
+    const mensagem = isConcluido 
+        ? 'Este serviço já foi concluído. Se você apagar, o valor será REMOVIDO do total ganho. Tem certeza?'
+        : 'Tem certeza que deseja cancelar este agendamento?';
+
+    Alert.alert(titulo, mensagem, [
+      { text: 'Não, manter', style: 'cancel' },
+      { 
+        text: isConcluido ? 'Sim, apagar' : 'Sim, cancelar', 
+        style: 'destructive', 
+        onPress: () => deleteAgendamento(id) 
+      },
     ])
   }
 
@@ -58,12 +66,13 @@ export default function Page() {
         <View style={styles.header} >
           {/*LEFT*/}
           <View style={styles.headerLeft}>
-            {/* Se não tiver a imagem logo.png, comente a linha abaixo */}
-            <Image
+            {/* Se tiver a logo, descomente */}
+            {/* <Image
               source={require('../../assets/images/logo.png')}
               style={styles.headerLogo}
               resizeMode='contain'
-            />
+            /> 
+            */}
             <View style={styles.welcomeContainer}>
               <Text style={styles.welcomeText}>Bem vindo,</Text>
               <Text style={styles.usernameText}>
@@ -94,7 +103,6 @@ export default function Page() {
         style={styles.transactionList}
         contentContainerStyle={styles.transactionListContent}
         data={agendamentos}
-        // 3. Passamos a função onComplete para o item
         renderItem={({ item }) => (
           <AgendamentoItem 
             item={item} 

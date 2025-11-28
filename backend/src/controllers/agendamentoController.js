@@ -1,13 +1,18 @@
 import { sql } from "../config/db.js";
 
-// --- NOVA FUNÇÃO: Listar TODOS os agendamentos (Para a Home) ---
+// --- Listar TODOS os agendamentos (Para a Home) ---
 export async function getAllAgendamentos(req, res) {
   try {
     const agendamentos = await sql`
       SELECT a.*, s.nome AS servico_nome
       FROM agendamento a
       JOIN servico_tipo s ON a.servico_tipo_id = s.id
-      ORDER BY a.data_servico, a.hora_servico
+      ORDER BY 
+        -- 1. Joga os Concluídos para o final da lista
+        CASE WHEN a.status = 'Concluído' THEN 2 ELSE 1 END,
+        -- 2. Ordena por data (mais antigos/urgentes primeiro)
+        a.data_servico ASC,
+        a.hora_servico ASC
     `;
     res.status(200).json(agendamentos);
   } catch (error) {
@@ -84,7 +89,7 @@ export async function deleteAgendamento(req, res) {
   }
 }
 
-// Atualizar status de um agendamento (ex: marcar como concluído)
+// Atualizar status de um agendamento
 export async function updateStatus(req, res) {
   try {
     const { id } = req.params;
@@ -96,7 +101,6 @@ export async function updateStatus(req, res) {
 
     let dataConclusao = null;
 
-    // Se o status for "Concluído", define a data atual para a Carteira
     if (novo_status === "Concluído") {
       dataConclusao = new Date().toISOString().split("T")[0];
     }
@@ -122,7 +126,7 @@ export async function updateStatus(req, res) {
   }
 }
 
-// Obter resumo geral (Concluídos, Agendados, Valor Total)
+// Obter resumo geral
 export async function getSummary(req, res) {
   try {
     const totalConcluidos = await sql`
