@@ -1,29 +1,24 @@
-// components/AgendamentoItem.jsx
-
 import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "../assets/styles/home.styles";
 import { COLORS } from "../constants/colors";
 import { formatDate } from "../lib/utils"; 
 
-// Função inteligente para escolher o ícone baseado no nome
 const getIconName = (nomeServico) => {
-  const nome = nomeServico.toLowerCase();
+  const nome = nomeServico ? nomeServico.toLowerCase() : '';
 
   if (nome.includes('corte') || nome.includes('grama')) return 'cut-outline';
   if (nome.includes('poda') || nome.includes('arvore') || nome.includes('árvore')) return 'leaf-outline';
-  if (nome.includes('limpeza')) return 'brush-outline'; // Mudei de lixeira para vassoura/escova
+  if (nome.includes('limpeza')) return 'brush-outline';
   if (nome.includes('paisagismo') || nome.includes('jardim')) return 'flower-outline';
-  if (nome.includes('veneno') || nome.includes('praga')) return 'flask-outline'; // Ícone para veneno
+  if (nome.includes('veneno') || nome.includes('praga')) return 'flask-outline';
   
-  return 'construct-outline'; // Padrão
+  return 'construct-outline';
 };
 
 export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
   const isConcluido = item.status === 'Concluído';
   const statusColor = isConcluido ? COLORS.income : COLORS.textLight;
-  
-  // Usa a função para pegar o ícone certo
   const iconName = getIconName(item.servico_nome);
 
   return (
@@ -47,7 +42,7 @@ export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
       {/* AÇÕES */}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         
-        {/* Botão de CONCLUIR (Só aparece se NÃO estiver concluído) */}
+        {/* 1. Botão de CONCLUIR (Só aparece se NÃO estiver concluído) */}
         {!isConcluido && (
             <TouchableOpacity 
                 style={[styles.deleteButton, { borderLeftWidth: 0 }]} 
@@ -57,18 +52,14 @@ export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
             </TouchableOpacity>
         )}
 
-        {/* Botão de DELETAR */}
-        {/* PROTEÇÃO: Só mostramos a lixeira se o serviço NÃO estiver concluído */}
-        {!isConcluido ? (
-          <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(item.id)}>
-              <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
-          </TouchableOpacity>
-        ) : (
-          // Opcional: Mostra um cadeado ou nada para indicar que está "travado" no histórico
-          <View style={[styles.deleteButton, { opacity: 0.3 }]}>
-             <Ionicons name="lock-closed-outline" size={20} color={COLORS.textLight} />
-          </View>
-        )}
+        {/* 2. Botão de DELETAR (LIXEIRA) */}
+        {/* AQUI ESTAVA O PROBLEMA: Agora ele aparece SEMPRE, não tem 'if' bloqueando */}
+        <TouchableOpacity 
+            style={styles.deleteButton} 
+            onPress={() => onDelete(item.id, isConcluido)}
+        >
+            <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
+        </TouchableOpacity>
 
       </View>
     </View>

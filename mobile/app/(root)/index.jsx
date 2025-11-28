@@ -66,13 +66,12 @@ export default function Page() {
         <View style={styles.header} >
           {/*LEFT*/}
           <View style={styles.headerLeft}>
-            {/* Se tiver a logo, descomente */}
-            {/* <Image
+            {/* LOGO ATIVA NOVAMENTE AQUI 👇 */}
+            <Image
               source={require('../../assets/images/logo.png')}
               style={styles.headerLogo}
               resizeMode='contain'
-            /> 
-            */}
+            />
             <View style={styles.welcomeContainer}>
               <Text style={styles.welcomeText}>Bem vindo,</Text>
               <Text style={styles.usernameText}>
