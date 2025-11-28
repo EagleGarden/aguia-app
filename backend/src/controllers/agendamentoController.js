@@ -7,9 +7,7 @@ export async function getAllAgendamentos(req, res) {
       SELECT a.*, s.nome AS servico_nome
       FROM agendamento a
       JOIN servico_tipo s ON a.servico_tipo_id = s.id
-      -- 👇 O SEGREDINHO ESTÁ AQUI:
-      -- Só trazemos o que NÃO estiver concluído.
-      -- Assim que você marcar como concluído, ele some da lista, mas fica no banco somando valor.
+      -- Traz tudo que NÃO está concluído (Pendentes e Em Andamento)
       WHERE a.status != 'Concluído' 
       ORDER BY 
         a.data_servico ASC,
@@ -127,14 +125,20 @@ export async function updateStatus(req, res) {
   }
 }
 
-// Obter resumo geral (Essa função CONTINUA contando os Concluídos, mesmo que a lista não mostre)
+// --- Obter Resumo (Carteira) ---
 export async function getSummary(req, res) {
   try {
+    // Agora filtramos por MÊS ATUAL e ANO ATUAL
     const totalConcluidos = await sql`
       SELECT COUNT(*) AS total_concluidos, COALESCE(SUM(valor), 0) AS total_valor
-      FROM agendamento WHERE status = 'Concluído'
+      FROM agendamento 
+      WHERE status = 'Concluído'
+      -- 👇 Filtro de Data Mágica (Mês e Ano do Servidor)
+      AND EXTRACT(MONTH FROM data_conclusao) = EXTRACT(MONTH FROM CURRENT_DATE)
+      AND EXTRACT(YEAR FROM data_conclusao) = EXTRACT(YEAR FROM CURRENT_DATE)
     `;
 
+    // Contagem de agendados continua geral (tudo o que tem pra fazer)
     const totalAgendados = await sql`
       SELECT COUNT(*) AS total_agendados
       FROM agendamento WHERE status != 'Concluído'
