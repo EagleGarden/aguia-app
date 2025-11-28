@@ -16,9 +16,11 @@ const getIconName = (nomeServico) => {
   return 'construct-outline';
 };
 
-export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
+export const AgendamentoItem = ({ item, onComplete }) => {
+  // Como a lista agora só mostra pendentes, o status nunca será 'Concluído' aqui.
+  // Mas mantemos a cor para garantir.
   const isConcluido = item.status === 'Concluído';
-  const statusColor = isConcluido ? COLORS.income : COLORS.textLight;
+  const statusColor = COLORS.textLight; // Sempre cinza/neutro pois ainda não foi pago
   const iconName = getIconName(item.servico_nome);
 
   return (
@@ -32,6 +34,7 @@ export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
           <Text style={{ color: statusColor, fontSize: 14 }}>{item.status}</Text>
         </View>
         <View style={styles.transactionRight}>
+          {/* Mostra o valor ou a hora */}
           <Text style={[styles.transactionAmount, { color: statusColor }]}>
             {item.valor > 0 ? `R$ ${item.valor}` : item.hora_servico.slice(0,5)}
           </Text>
@@ -39,26 +42,14 @@ export const AgendamentoItem = ({ item, onDelete, onComplete }) => {
         </View>
       </TouchableOpacity>
 
-      {/* AÇÕES */}
+      {/* AÇÕES: Apenas o botão de Concluir */}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         
-        {/* 1. Botão de CONCLUIR (Só aparece se NÃO estiver concluído) */}
-        {!isConcluido && (
-            <TouchableOpacity 
-                style={[styles.deleteButton, { borderLeftWidth: 0 }]} 
-                onPress={() => onComplete(item.id)}
-            >
-                <Ionicons name="checkmark-circle-outline" size={24} color={COLORS.income} />
-            </TouchableOpacity>
-        )}
-
-        {/* 2. Botão de DELETAR (LIXEIRA) */}
-        {/* AQUI ESTAVA O PROBLEMA: Agora ele aparece SEMPRE, não tem 'if' bloqueando */}
         <TouchableOpacity 
-            style={styles.deleteButton} 
-            onPress={() => onDelete(item.id, isConcluido)}
+            style={[styles.deleteButton, { borderLeftWidth: 1 }]} 
+            onPress={() => onComplete(item.id)}
         >
-            <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
+            <Ionicons name="checkmark-circle-outline" size={28} color={COLORS.income} />
         </TouchableOpacity>
 
       </View>
